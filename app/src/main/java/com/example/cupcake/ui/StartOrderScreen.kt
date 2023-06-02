@@ -76,7 +76,7 @@ fun StartOrderScreen(
         }
         Row(modifier = Modifier.weight(1f, false)) {
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(
                     dimensionResource(id = R.dimen.padding_medium)
