@@ -29,13 +29,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.cupcake.data.DataSource
+import com.example.cupcake.ui.OrderSummaryScreen
 import com.example.cupcake.ui.OrderViewModel
+import com.example.cupcake.ui.SelectOptionScreen
+import com.example.cupcake.ui.StartOrderScreen
 
 enum class CupcakeScreen() {
     Start, Flavor, Pickup, Summary
@@ -85,6 +90,40 @@ fun CupcakeApp(
     ) { innerPadding ->
         val uiState by viewModel.uiState.collectAsState()
 
+        NavHost(
+            navController = navController,
+            startDestination = CupcakeScreen.Start.name,
+            modifier = Modifier.padding(innerPadding)
+        ) {
 
+            composable(route = CupcakeScreen.Start.name) {
+                StartOrderScreen(quantityOptions = DataSource.quantityOptions)
+            }
+            composable(route = CupcakeScreen.Flavor.name) {
+                /*
+                    Context is an abstract class whose implementation is provided
+                    by the Android system. It allows access to application-specific
+                    resources and classes, as well as up-calls for application-level
+                    operations such as launching activities, etc.
+                */
+                val context = LocalContext.current
+                SelectOptionScreen(
+                    subtotal = uiState.price,
+                    options = DataSource.flavors.map { id -> context.resources.getString(id) },
+                    onSelectionChanged = { viewModel.setFlavor(it) }
+                )
+
+            }
+            composable(route = CupcakeScreen.Pickup.name) {
+                SelectOptionScreen(
+                    subtotal = uiState.price,
+                    options = uiState.pickupOptions,
+                    onSelectionChanged = { viewModel.setDate(it) }
+                )
+            }
+            composable(route = CupcakeScreen.Summary.name) {
+                OrderSummaryScreen(orderUiState = uiState)
+            }
+        }
     }
 }
